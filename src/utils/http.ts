@@ -25,3 +25,46 @@ const httpInterceptor = {
 }
 uni.addInterceptor('request', httpInterceptor)
 uni.addInterceptor('uploadFile ', httpInterceptor)
+
+interface Data<T> {
+  code: string
+  msg: string
+  result: T
+}
+export const http = <T>(options: UniApp.RequestOptions) => {
+  //返回promise对象
+  return new Promise<Data<T>>((resolve, reject) => {
+    //发送请求
+    uni.request({
+      ...options,
+      //请求响应成功
+      success(res) {
+        //判断请求状态码2开头
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          //执行resolve提取核心数据
+          resolve(res.data as Data<T>)
+        } else if (res.statusCode === 401) {
+          const memberStore = useMemberStore()
+          memberStore.clearProfile()
+          //token错误跳转页面
+          uni.navigateTo({ url: '/pages/login/login' })
+          reject(res)
+        } else {
+          uni.showToast({
+            icon: 'none',
+            title: (res.data as Data<T>).msg || '请求错误',
+          })
+          reject(res)
+        }
+      },
+      //请求响应失败
+      fail(err) {
+        uni.showToast({
+          icon: 'none',
+          title: '网络错误，请换个网络试试',
+        })
+        reject(err)
+      },
+    })
+  })
+}
