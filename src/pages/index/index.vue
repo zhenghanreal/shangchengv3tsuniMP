@@ -7,13 +7,15 @@ import type { XtxGuessInstance } from '@/types/component'
 import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from './components/CategoryPanel.vue'
 import HotPanel from './components//HotPanel.vue'
+import Skeleton from './components/Skeleton.vue'
 //接口
 import { getHomeBannerAPI, getHomeCategoryAPI, getHomeHotAPI } from '@/services/home'
 
-onLoad(() => {
-  getBannerList()
-  getCategoryList()
-  getHotList()
+const isShow = ref(false)
+onLoad(async () => {
+  isShow.value = true
+  await Promise.all([getBannerList(), getCategoryList(), getHotList()])
+  isShow.value = false
 })
 //获取轮播图列表
 const bannerList = ref<BannerItem[]>([])
@@ -38,20 +40,41 @@ const guessRef = ref<XtxGuessInstance>()
 const onScrolltolower = () => {
   guessRef.value?.getMore()
 }
+//下拉刷新
+const isTriggered = ref(false)
+const onRefresherrefresh = async () => {
+  isTriggered.value = true
+  //重置猜你喜欢数据
+  guessRef.value?.resetData()
+  //重新获取首页数据完成刷新
+  await Promise.all([guessRef.value?.getMore(), getBannerList(), getCategoryList(), getHotList()])
+  isTriggered.value = false
+}
 </script>
 
 <template>
   <!-- 引入自定义导航栏 -->
   <CustomNavbar></CustomNavbar>
-  <scroll-view @scrolltolower="onScrolltolower" class="scrollView" scroll-y>
-    <!-- 引入轮播图 -->
-    <XtxSwiper :list="bannerList"></XtxSwiper>
-    <!-- 引入分类 -->
-    <CategoryPanel :list="categoryList"></CategoryPanel>
-    <!-- 引入热门推荐 -->
-    <HotPanel :list="hotList"></HotPanel>
-    <!-- 引入猜你喜欢 -->
-    <XtxGuess ref="guessRef"></XtxGuess>
+  <scroll-view
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    :refresher-triggered="isTriggered"
+    @scrolltolower="onScrolltolower"
+    class="scrollView"
+    scroll-y
+  >
+    <!-- 引入骨架屏 -->
+    <Skeleton v-if="isShow"></Skeleton>
+    <template v-else>
+      <!-- 引入轮播图 -->
+      <XtxSwiper :list="bannerList"></XtxSwiper>
+      <!-- 引入分类 -->
+      <CategoryPanel :list="categoryList"></CategoryPanel>
+      <!-- 引入热门推荐 -->
+      <HotPanel :list="hotList"></HotPanel>
+      <!-- 引入猜你喜欢 -->
+      <XtxGuess ref="guessRef"></XtxGuess>
+    </template>
   </scroll-view>
 </template>
 

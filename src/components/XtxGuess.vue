@@ -29,8 +29,15 @@ const getGuessLikeList = async () => {
     finish.value = true
   }
 }
+//下拉刷新事件,重置数据，页数
+const resetData = () => {
+  PageParams.page = 1
+  finish.value = false
+  guessLikeList.value = []
+}
 //暴露方法给父组件
 defineExpose({
+  resetData,
   getMore: getGuessLikeList,
 })
 </script>
