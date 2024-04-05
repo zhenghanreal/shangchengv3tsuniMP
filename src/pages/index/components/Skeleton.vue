@@ -1,7 +1,7 @@
 <template name="skeleton">
   <view is="components/XtxSwiper">
     <view class="carousel XtxSwiper--carousel">
-      <swiper circular="true" interval="3000" current="0" autoplay="false">
+      <swiper :circular="true" :interval="3000" :current="0" :autoplay="false">
         <swiper-item
           style="
             position: absolute;
