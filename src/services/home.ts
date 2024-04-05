@@ -3,10 +3,13 @@ import type { BannerItem, CategoryItem, GuessItem, HotItem } from '@/types/home'
 import { http } from '@/utils/http'
 
 //首页轮播图接口
-export const getHomeBannerAPI = () => {
+export const getHomeBannerAPI = (distributionSite = 1) => {
   return http<BannerItem[]>({
     method: 'GET',
-    url: '/home/banner?distributionSite=1',
+    url: '/home/banner',
+    data: {
+      distributionSite,
+    },
   })
 }
 //首页分类接口
