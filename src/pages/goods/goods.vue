@@ -1,5 +1,7 @@
 // src/pages/goods/goods.vue
 <script setup lang="ts">
+import addressPanel from './components/AddressPanel.vue'
+import servicePanel from './components/ServicePanel.vue'
 import { getGoodsByIdAPI } from '@/services/goods'
 import type { GoodsResult } from '@/types/goods'
 import { onLoad } from '@dcloudio/uni-app'
@@ -30,6 +32,19 @@ const onTapImage = (url: string) => {
     current: url,
     urls: goods.value!.mainPictures,
   })
+}
+
+//弹出框
+const popup = ref<{
+  open: (type?: 'bottom') => void
+  close: () => void
+}>()
+//弹出框条件，获取点击的对象
+const popupName = ref('')
+const openPopup = (name: typeof popupName.value) => {
+  popupName.value = name
+  //打开对应弹出框
+  popup.value?.open()
 }
 </script>
 
@@ -67,16 +82,22 @@ const onTapImage = (url: string) => {
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>
-        <view class="item arrow">
+        <view class="item arrow" @tap="openPopup('address')">
           <text class="label">送至</text>
           <text class="text ellipsis"> 请选择收获地址 </text>
         </view>
-        <view class="item arrow">
+        <view class="item arrow" @tap="openPopup('service')">
           <text class="label">服务</text>
           <text class="text ellipsis"> 无忧退 快速退款 免费包邮 </text>
         </view>
       </view>
     </view>
+
+    <!-- uni-popup弹出框 -->
+    <uni-popup ref="popup" type="bottom" background-color="#fff">
+      <addressPanel v-if="popupName === 'address'" @close="popup?.close"></addressPanel>
+      <servicePanel v-if="popupName === 'service'" @close="popup?.close"></servicePanel>
+    </uni-popup>
 
     <!-- 商品详情 -->
     <view class="detail panel">
