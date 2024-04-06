@@ -99,24 +99,34 @@
 	},
 	"subPackages": [
 		{
-		  // 子包的根目录
-		  "root": "pagesMember",
-		  // 页面路径和窗口表现
-		  "pages": [
-			{
-			  "path": "settings/settings",
-			  "style": {
-				"navigationBarTitleText": "设置"
-			  }
-			}
-		  ]
+			// 子包的根目录
+			"root": "pagesMember",
+			// 页面路径和窗口表现
+			"pages": [
+				{
+					"path": "settings/settings",
+					"style": {
+						"navigationBarTitleText": "设置"
+					}
+				},
+				{
+					"path": "profile/profile",
+					"style": {
+						"navigationStyle": "custom",
+						"navigationBarTextStyle": "white",
+						"navigationBarTitleText": "个人信息"
+					}
+				}
+			]
 		}
 	],
-	  // 分包预下载规则
-	  "preloadRule": {
+	// 分包预下载规则
+	"preloadRule": {
 		"pages/my/my": {
-		  "network": "all", 
-		  "packages": ["pagesMember"] 
+			"network": "all",
+			"packages": [
+				"pagesMember"
+			]
 		}
 	}
 }
