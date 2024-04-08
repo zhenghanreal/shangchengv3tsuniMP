@@ -63,7 +63,7 @@ const onFullLocationChange: UniHelper.RegionPickerOnChange = (ev) => {
   fullLocationCode = ev.detail.code!
 }
 //保存
-const onSummit = async () => {
+const onSubmit = async () => {
   if (fullLocationCode[0] === '') {
     await putMemberProfileAPI({
       nickname: profile!.value.nickname,
@@ -161,7 +161,7 @@ const onSummit = async () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button @tap="onSummit" class="form-button">保 存</button>
+      <button @tap="onSubmit" class="form-button">保 存</button>
     </view>
   </view>
 </template>
