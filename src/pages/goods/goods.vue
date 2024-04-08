@@ -1,6 +1,10 @@
 // src/pages/goods/goods.vue
 <script setup lang="ts">
-import type { SkuPopupInstance, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup'
+import type {
+  SkuPopupEvent,
+  SkuPopupInstance,
+  SkuPopupLocaldata,
+} from '@/components/vk-data-goods-sku-popup'
 import addressPanel from './components/AddressPanel.vue'
 import servicePanel from './components/ServicePanel.vue'
 import { getGoodsByIdAPI } from '@/services/goods'
@@ -8,6 +12,7 @@ import type { GoodsResult } from '@/types/goods'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { computed } from 'vue'
+import { postMemberCartAPI } from '@/services/cart'
 
 onLoad(() => {
   getGoodsByIdData()
@@ -92,6 +97,15 @@ const selectArrText = computed(() => {
   //trim()去除空格
   return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
 })
+//加入购物车
+const onAddCart = (ev: SkuPopupEvent) => {
+  postMemberCartAPI({
+    skuId: ev._id,
+    count: ev.buy_num,
+  })
+  uni.showToast({ title: '添加成功' })
+  isShowSku.value = false
+}
 </script>
 
 <template>
@@ -107,6 +121,7 @@ const selectArrText = computed(() => {
       borderColor: '#27BA9B',
       backgroundColor: '#E9F8F5',
     }"
+    @add-cart="onAddCart"
   ></vk-data-goods-sku-popup>
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
