@@ -1,6 +1,23 @@
 // AddressPanel.vue
 <script setup lang="ts">
+import { getMemberAddressAPI } from '@/services/address'
+import type { AddressItem } from '@/types/address'
+import { ref } from 'vue'
+
 const emit = defineEmits(['close'])
+const addressList = ref<AddressItem[]>()
+const getAddressList = async () => {
+  let res = await getMemberAddressAPI()
+  addressList.value = res.result
+}
+const checkAddress = ref<AddressItem>()
+const isActive = ref()
+const onChangeAddress = (item: AddressItem) => {
+  checkAddress.value = item
+  isActive.value = item.id
+  emit('close')
+}
+defineExpose({ getAddressList, checkAddress })
 </script>
 
 <template>
@@ -11,20 +28,10 @@ const emit = defineEmits(['close'])
     <view class="title">配送至</view>
     <!-- 内容 -->
     <view class="content">
-      <view class="item">
-        <view class="user">李明 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-checked"></text>
-      </view>
-      <view class="item">
-        <view class="user">王东 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-ring"></text>
-      </view>
-      <view class="item">
-        <view class="user">张三 13824686868</view>
-        <view class="address">北京市朝阳区孙河安平北街6号院</view>
-        <text class="icon icon-ring"></text>
+      <view class="item" v-for="item in addressList" :key="item.id" @tap="onChangeAddress(item)">
+        <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+        <view class="address">{{ item.fullLocation }} {{ item.address }}</view>
+        <text :class="item.id === isActive ? 'icon-checked' : ''" class="icon"></text>
       </view>
     </view>
     <view class="footer">

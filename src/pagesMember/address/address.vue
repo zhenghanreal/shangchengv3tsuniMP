@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getMemberAddressAPI, deleteMemberAddressByIdAPI } from '@/services/address'
+import { useAddressStore } from '@/stores/modules/address'
 import type { AddressItem } from '@/types/address'
 import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -13,6 +14,7 @@ const getAddressList = async () => {
   let res = await getMemberAddressAPI()
   addressList.value = res.result
 }
+//删除地址
 const onDeleteAddress = (id: string) => {
   uni.showModal({
     content: '是否删除',
@@ -25,6 +27,13 @@ const onDeleteAddress = (id: string) => {
     },
   })
 }
+//选中地址
+const onChangeAddress = (item: AddressItem) => {
+  //获取pinia方法
+  const addressStore = useAddressStore()
+  addressStore.changeSelectedAddress(item)
+  uni.navigateBack()
+}
 </script>
 
 <template>
@@ -35,7 +44,7 @@ const onDeleteAddress = (id: string) => {
         <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
           <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
-            <view class="item-content">
+            <view @tap="onChangeAddress(item)" class="item-content">
               <view class="user">
                 {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
@@ -43,6 +52,7 @@ const onDeleteAddress = (id: string) => {
               </view>
               <view class="locate">{{ item.fullLocation }} {{ item.address }}</view>
               <navigator
+                @tap.stop="() => {}"
                 class="edit"
                 hover-class="none"
                 :url="`/pagesMember/address-form/address-form?id=${item.id}`"

@@ -71,11 +71,24 @@ const popup = ref<{
 }>()
 //弹出框条件，获取点击的对象
 const popupName = ref('')
+//地址列表弹出窗实力
+const addressRef = ref()
 const openPopup = (name: typeof popupName.value) => {
+  if (name === 'address') {
+    addressRef.value.getAddressList()
+  }
   popupName.value = name
   //打开对应弹出框
   popup.value?.open()
 }
+//选中地址文本
+const checkAddress = computed(() => {
+  if (addressRef.value?.checkAddress) {
+    return addressRef.value.checkAddress.fullLocation + addressRef.value.checkAddress.address
+  } else {
+    return '请选择收获地址'
+  }
+})
 //显示sku弹窗组件
 const isShowSku = ref(false)
 //sku弹窗的数据
@@ -106,6 +119,10 @@ const onAddCart = (ev: SkuPopupEvent) => {
   uni.showToast({ title: '添加成功' })
   isShowSku.value = false
 }
+//立刻购买
+const onBuyNow = (ev: SkuPopupEvent) => {
+  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
+}
 </script>
 
 <template>
@@ -122,6 +139,7 @@ const onAddCart = (ev: SkuPopupEvent) => {
       backgroundColor: '#E9F8F5',
     }"
     @add-cart="onAddCart"
+    @buy-now="onBuyNow"
   ></vk-data-goods-sku-popup>
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
@@ -158,7 +176,7 @@ const onAddCart = (ev: SkuPopupEvent) => {
         </view>
         <view class="item arrow" @tap="openPopup('address')">
           <text class="label">送至</text>
-          <text class="text ellipsis"> 请选择收获地址 </text>
+          <text class="text ellipsis"> {{ checkAddress }} </text>
         </view>
         <view class="item arrow" @tap="openPopup('service')">
           <text class="label">服务</text>
@@ -169,8 +187,12 @@ const onAddCart = (ev: SkuPopupEvent) => {
 
     <!-- uni-popup弹出框 -->
     <uni-popup ref="popup" type="bottom" background-color="#fff">
-      <addressPanel v-if="popupName === 'address'" @close="popup?.close"></addressPanel>
-      <servicePanel v-if="popupName === 'service'" @close="popup?.close"></servicePanel>
+      <addressPanel
+        ref="addressRef"
+        v-show="popupName === 'address'"
+        @close="popup?.close"
+      ></addressPanel>
+      <servicePanel v-show="popupName === 'service'" @close="popup?.close"></servicePanel>
     </uni-popup>
 
     <!-- 商品详情 -->

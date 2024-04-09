@@ -79,7 +79,7 @@ const onPayment = () => {
   if (!selectedCartListCount.value) {
     return uni.showToast({ icon: 'none', title: '请选择商品' })
   }
-  uni.showToast({ title: '等待完成' })
+  uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 </script>
 
@@ -150,7 +150,7 @@ const onPayment = () => {
       <view class="toolbar">
         <text @tap="onChangeSelectedAll" class="all" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
-        <text class="amount">{{ selectedCartListMoney }}</text>
+        <text class="amount">{{ selectedCartListMoney.toFixed(2) }}</text>
         <view class="button-grounp">
           <view
             @tap="onPayment"
