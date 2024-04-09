@@ -16,3 +16,19 @@ export const getMemberCartAPI = () => {
     url: '/member/cart',
   })
 }
+// 删除/清空购物车单品
+export const deleteMemberCartAPI = (data: { ids: string[] }) => {
+  return http({
+    method: 'DELETE',
+    url: '/member/cart',
+    data,
+  })
+}
+// 修改购物车单品
+export const putMemberCartAPI = (skuId: string, data: { selected?: boolean; count?: number }) => {
+  return http({
+    method: 'PUT',
+    url: `/member/cart/${skuId}`,
+    data,
+  })
+}

@@ -4,7 +4,7 @@ import type {
   SkuPopupEvent,
   SkuPopupInstance,
   SkuPopupLocaldata,
-} from '@/components/vk-data-goods-sku-popup'
+} from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup'
 import addressPanel from './components/AddressPanel.vue'
 import servicePanel from './components/ServicePanel.vue'
 import { getGoodsByIdAPI } from '@/services/goods'
