@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
@@ -27,16 +27,27 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 const query = defineProps<{
   skuId: string
   count: string
+  addressId: string
 }>()
 //选中商品列表
 const orderList = ref<OrderPreResult>()
 const getorderList = async () => {
   if (query.skuId && query.count) {
-    let res = await getMemberOrderPreNowAPI({
-      skuId: query.skuId,
-      count: query.count,
-    })
-    orderList.value = res.result
+    //有选择地址的情况下
+    if (query.addressId) {
+      let res = await getMemberOrderPreNowAPI({
+        skuId: query.skuId,
+        count: query.count,
+        addressId: query.addressId,
+      })
+      orderList.value = res.result
+    } else {
+      let res = await getMemberOrderPreNowAPI({
+        skuId: query.skuId,
+        count: query.count,
+      })
+      orderList.value = res.result
+    }
   } else {
     let res = await getMemberOrderPreAPI()
     orderList.value = res.result
@@ -48,10 +59,34 @@ onLoad(() => {
 // 收货地址
 const addressStore = useAddressStore()
 const selectedAddress = computed(() => {
-  return (
-    addressStore.selectedAddress || orderList.value?.userAddresses.find((item) => item.isDefault)
-  )
+  //有选择地址的情况下
+  if (query.addressId) {
+    return addressStore.selectedAddress || orderList.value?.userAddresses[0]
+  } else {
+    return (
+      addressStore.selectedAddress || orderList.value?.userAddresses.find((item) => item.isDefault)
+    )
+  }
 })
+//提交订单
+const onSubmit = async () => {
+  // 没用收货地址退出
+  if (!selectedAddress.value?.id) {
+    return uni.showToast({ icon: 'none', title: '请选择收货地址' })
+  }
+  let res = await postMemberOrderAPI({
+    addressId: selectedAddress.value!.id,
+    deliveryTimeType: activeDelivery.value.type,
+    buyerMessage: buyerMessage.value,
+    goods: orderList.value!.goods.map((item) => {
+      return { count: item.count, skuId: item.skuId }
+    }),
+    payChannel: 2,
+    payType: 1,
+  })
+  //关闭页面并且跳转至新页面
+  uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
+}
 </script>
 
 <template>
@@ -138,7 +173,9 @@ const selectedAddress = computed(() => {
     <view class="total-pay symbol">
       <text class="number">{{ orderList?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view @tap="onSubmit" class="button" :class="{ disabled: !selectedAddress?.id }">
+      提交订单
+    </view>
   </view>
 </template>
 

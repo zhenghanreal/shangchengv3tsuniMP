@@ -121,7 +121,13 @@ const onAddCart = (ev: SkuPopupEvent) => {
 }
 //立刻购买
 const onBuyNow = (ev: SkuPopupEvent) => {
-  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
+  if (addressRef.value?.checkAddress) {
+    uni.navigateTo({
+      url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}&addressId=${addressRef.value.checkAddress.id}`,
+    })
+  } else {
+    uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
+  }
 }
 </script>
 
