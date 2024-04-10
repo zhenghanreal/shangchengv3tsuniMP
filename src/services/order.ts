@@ -35,3 +35,17 @@ export const getMemberOrderById = (id: string) => {
     url: `/member/order/${id}`,
   })
 }
+// 模拟发货-内测版
+export const getMemberOrderConsignmentAPI = (id: string) => {
+  return http({
+    method: 'GET',
+    url: `/member/order/consignment/${id}`,
+  })
+}
+// 确认收货
+export const putMemberOrderReceiptAPI = (id: string) => {
+  return http<OrderResult>({
+    method: 'PUT',
+    url: `/member/order/${id}/receipt`,
+  })
+}
